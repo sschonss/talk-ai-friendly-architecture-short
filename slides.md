@@ -156,7 +156,7 @@ O agente não sabe nada disso por padrão. Contexto espalhado, escondido ou inco
 
 <p class="muted small">Com contexto</p>
 <div class="flow">
-<div>Doc de Payments</div><span>→</span>
+<div><code>docs/payments</code></div><span>→</span>
 <div>Runbook</div><span>→</span>
 <div>Queries</div><span>→</span>
 <div class="ok">Hipótese focada</div>
@@ -165,7 +165,7 @@ O agente não sabe nada disso por padrão. Contexto espalhado, escondido ou inco
 <!--
 Apresentar o domínio que vai nos acompanhar até o fim: pagamentos. Cenário: a latência do checkout começa a subir (vamos chamar de INC-2291).
 SEM arquitetura AI-friendly, o agente depende de sorte: procura logs no serviço errado, lê dashboards sem saber quais métricas importam, perde tempo e sugere hipóteses genéricas ("aumente os recursos").
-COM contexto organizado o caminho é direto: entra pela página do domínio na base de documentação, acha o runbook de latência, usa as queries prontas e chega numa hipótese focada.
+COM contexto organizado o caminho é direto: entra na pasta de docs do domínio, acha o runbook de latência, usa as queries prontas e chega numa hipótese focada.
 Em detalhe:
 1. Identifica o serviço afetado (Payment Service)
 2. Consulta a doc do domínio de pagamentos
@@ -225,47 +225,94 @@ Para o agente é igual: se ele só olha taxa de erro, conclui "está saudável".
 
 ---
 
-## Um ponto de entrada, o resto se descobre
+## Context Architecture
 
-<svg class="network" viewBox="0 0 1640 560" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Um ponto de entrada leva ao domínio e dele às fontes de contexto; o repositório guarda só código">
-<defs><marker id="arrd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3b5bdb"/></marker></defs>
-<line x1="323" y1="225" x2="525" y2="225" stroke="#3b5bdb" stroke-width="3" marker-end="url(#arrd)"/>
-<line x1="868" y1="225" x2="1215" y2="55" stroke="#3b5bdb" stroke-width="3" marker-end="url(#arrd)"/>
-<line x1="868" y1="225" x2="1215" y2="165" stroke="#3b5bdb" stroke-width="3" marker-end="url(#arrd)"/>
-<line x1="868" y1="225" x2="1215" y2="275" stroke="#3b5bdb" stroke-width="3" marker-end="url(#arrd)"/>
-<line x1="868" y1="225" x2="1215" y2="385" stroke="#3b5bdb" stroke-width="3" marker-end="url(#arrd)"/>
-<rect x="60" y="185" width="260" height="80" rx="16" fill="#ffffff" stroke="#e4e1da" stroke-width="2"/>
-<text x="190.0" y="235.0" text-anchor="middle" font-family="Inter, sans-serif" font-size="30" font-weight="600" fill="#1d1f24">Índice</text>
-<rect x="535" y="185" width="330" height="80" rx="16" fill="#3b5bdb" stroke="#3b5bdb" stroke-width="2"/>
-<text x="700.0" y="235.0" text-anchor="middle" font-family="Inter, sans-serif" font-size="30" font-weight="700" fill="#ffffff">Domínio Payments</text>
-<rect x="1225" y="20" width="330" height="70" rx="16" fill="#ffffff" stroke="#e4e1da" stroke-width="2"/>
-<text x="1390.0" y="65.0" text-anchor="middle" font-family="Inter, sans-serif" font-size="30" font-weight="600" fill="#1d1f24">ADRs</text>
-<rect x="1225" y="130" width="330" height="70" rx="16" fill="#ffffff" stroke="#e4e1da" stroke-width="2"/>
-<text x="1390.0" y="175.0" text-anchor="middle" font-family="Inter, sans-serif" font-size="30" font-weight="600" fill="#1d1f24">Runbooks</text>
-<rect x="1225" y="240" width="330" height="70" rx="16" fill="#ffffff" stroke="#e4e1da" stroke-width="2"/>
-<text x="1390.0" y="285.0" text-anchor="middle" font-family="Inter, sans-serif" font-size="30" font-weight="600" fill="#1d1f24">Queries</text>
-<rect x="1225" y="350" width="330" height="70" rx="16" fill="#eef1fd" stroke="#3b5bdb" stroke-width="2"/>
-<text x="1390.0" y="395.0" text-anchor="middle" font-family="Inter, sans-serif" font-size="30" font-weight="600" fill="#1d1f24">Context Skill</text>
-<text x="1390" y="445" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" fill="#7a7d86">owner: payments-team</text>
-<text x="190" y="308" text-anchor="middle" font-family="Inter, sans-serif" font-size="24" font-weight="700" letter-spacing="2" fill="#7a7d86">PONTO DE ENTRADA</text>
-<text x="700" y="308" text-anchor="middle" font-family="Inter, sans-serif" font-size="24" font-weight="700" letter-spacing="2" fill="#7a7d86">BASE DE DOCS</text>
-<rect x="60" y="440" width="420" height="80" rx="16" fill="#f4f2ee" stroke="#c9c5bc" stroke-width="2" stroke-dasharray="8 6"/>
-<text x="270.0" y="490.0" text-anchor="middle" font-family="Inter, sans-serif" font-size="28" font-weight="600" fill="#7a7d86">Repositório · só código</text>
-</svg>
+<div class="cols">
+<div class="card bad">
 
-<p class="muted">O repositório guarda código. O contexto mora na <b>documentação</b>.</p>
+### Não é
+- Um documento gigante
+- Tudo num vector DB
+
+</div>
+<div class="card good">
+
+### É
+- Caminhos entre fontes
+- Menos esforço para achar
+
+</div>
+</div>
+
+<br>
+
+<p class="muted">Ter informação <b>não é</b> ter contexto.</p>
 
 <!--
-Onde o contexto deve morar: não no repositório. O repositório é para código.
-O contexto fica numa base de documentação CENTRALIZADA e DESCOBRÍVEL, separada dos repos de código.
-- Você não cola documentação no prompt: entrega ao agente um ponto de entrada (um índice).
-- Do índice ele navega até a página do domínio (Payments), que tem dono e data de atualização, e dela até o que precisa: ADRs (o porquê), runbooks (o que fazer), queries prontas e a Context Skill do domínio.
-- A página aponta, não copia: cada coisa vive no sistema onde vive. O código é só mais um link.
-- Context Skill com dono (payments-team) e revisão: se todo mundo é dono, ninguém é, e o agente trabalha com conhecimento velho.
-- Ele não lê tudo: segue só os links relevantes para a tarefa.
-Se a resposta é "pergunta pro fulano", falta documentação.
-Comece pequeno: um fluxo crítico (checkout), uma página de domínio, um runbook.
-Transição: "Documentação dá contexto. Mas contexto não é garantia."
+Para entender um sistema, a pessoa nova precisa de: código, documentação, decisões de arquitetura, tickets e épicos, incidentes anteriores, dashboards e métricas, conversas com o time.
+Na maioria das empresas a informação EXISTE, mas está DESCONECTADA: código num repo, decisões numa wiki, tickets em outro sistema, incidentes na plataforma de operação, e o contexto-chave na cabeça de poucas pessoas.
+
+Definição: uma forma de organizar e CONECTAR as fontes de conhecimento que explicam um sistema.
+Perguntas que ela deve responder:
+- Pelo que esse serviço é responsável?
+- Quem depende dele?
+- Por que foi construído assim?
+- Qual regra de negócio se aplica?
+- Como sabemos que funciona?
+- O que aconteceu da última vez que isso mudou?
+Não remove o raciocínio: reduz o esforço de achar a informação certa.
+-->
+
+---
+
+## Uma rede, não um lugar
+
+<svg class="network" viewBox="-10 0 1100 440" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Rede de fontes de contexto conectadas">
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3b5bdb"/></marker></defs>
+<line x1="500" y1="110" x2="730" y2="40" stroke="#c3c8d4" stroke-width="2"/>
+<line x1="500" y1="110" x2="730" y2="220" stroke="#c3c8d4" stroke-width="2"/>
+<line x1="500" y1="110" x2="960" y2="110" stroke="#c3c8d4" stroke-width="2"/>
+<line x1="500" y1="330" x2="730" y2="220" stroke="#c3c8d4" stroke-width="2"/>
+<line x1="500" y1="330" x2="730" y2="400" stroke="#c3c8d4" stroke-width="2"/>
+<line x1="500" y1="330" x2="960" y2="330" stroke="#c3c8d4" stroke-width="2"/>
+<line x1="730" y1="40" x2="730" y2="220" stroke="#c3c8d4" stroke-width="2"/>
+<line x1="730" y1="220" x2="730" y2="400" stroke="#c3c8d4" stroke-width="2"/>
+<line x1="730" y1="40" x2="960" y2="110" stroke="#c3c8d4" stroke-width="2"/>
+<line x1="730" y1="400" x2="960" y2="330" stroke="#c3c8d4" stroke-width="2"/>
+<line x1="960" y1="220" x2="960" y2="110" stroke="#c3c8d4" stroke-width="2"/>
+<line x1="960" y1="220" x2="960" y2="330" stroke="#c3c8d4" stroke-width="2"/>
+<line x1="730" y1="220" x2="960" y2="220" stroke="#c3c8d4" stroke-width="2"/>
+<line x1="157" y1="220" x2="199" y2="220" stroke="#3b5bdb" stroke-width="2.5" marker-end="url(#arr)"/>
+<line x1="340" y1="190" x2="432" y2="144" stroke="#3b5bdb" stroke-width="2.5" marker-end="url(#arr)"/>
+<line x1="357" y1="220" x2="649" y2="220" stroke="#3b5bdb" stroke-width="2.5" marker-end="url(#arr)"/>
+<line x1="340" y1="250" x2="432" y2="296" stroke="#3b5bdb" stroke-width="2.5" marker-end="url(#arr)"/>
+<rect x="-2" y="192.0" width="164" height="56" rx="14" fill="#ffffff" stroke="#e4e1da" stroke-width="1.5"/>
+<text x="80" y="228" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" font-weight="600" fill="#1d1f24">Tarefa</text>
+<rect x="198" y="192.0" width="164" height="56" rx="14" fill="#3b5bdb" stroke="#3b5bdb" stroke-width="1.5"/>
+<text x="280" y="228" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" font-weight="700" fill="#ffffff">Domínio</text>
+<rect x="418" y="82.0" width="164" height="56" rx="14" fill="#ffffff" stroke="#e4e1da" stroke-width="1.5"/>
+<text x="500" y="118" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" font-weight="600" fill="#1d1f24">Serviços</text>
+<rect x="418" y="302.0" width="164" height="56" rx="14" fill="#ffffff" stroke="#e4e1da" stroke-width="1.5"/>
+<text x="500" y="338" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" font-weight="600" fill="#1d1f24">Docs</text>
+<rect x="648" y="12.0" width="164" height="56" rx="14" fill="#ffffff" stroke="#e4e1da" stroke-width="1.5"/>
+<text x="730" y="48" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" font-weight="600" fill="#1d1f24">Decisões</text>
+<rect x="648" y="192.0" width="164" height="56" rx="14" fill="#ffffff" stroke="#e4e1da" stroke-width="1.5"/>
+<text x="730" y="228" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" font-weight="600" fill="#1d1f24">Código</text>
+<rect x="648" y="372.0" width="164" height="56" rx="14" fill="#ffffff" stroke="#e4e1da" stroke-width="1.5"/>
+<text x="730" y="408" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" font-weight="600" fill="#1d1f24">Tickets</text>
+<rect x="878" y="82.0" width="164" height="56" rx="14" fill="#ffffff" stroke="#e4e1da" stroke-width="1.5"/>
+<text x="960" y="118" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" font-weight="600" fill="#1d1f24">Dashboards</text>
+<rect x="878" y="192.0" width="164" height="56" rx="14" fill="#ffffff" stroke="#e4e1da" stroke-width="1.5"/>
+<text x="960" y="228" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" font-weight="600" fill="#1d1f24">Incidentes</text>
+<rect x="878" y="302.0" width="164" height="56" rx="14" fill="#ffffff" stroke="#e4e1da" stroke-width="1.5"/>
+<text x="960" y="338" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" font-weight="600" fill="#1d1f24">Runbooks</text>
+</svg>
+
+<!--
+Uma página única "Como a empresa funciona" fica desatualizada rápido.
+Cada fonte fica onde funciona melhor. O que muda: LINKS CLAROS entre elas.
+No diagrama: a tarefa leva ao domínio, e o domínio é a porta de entrada para serviços, código e docs. A partir daí, tudo se referencia: a decisão explica o código, o dashboard aponta para o runbook, o incidente liga o código ao dashboard, o ticket cita a decisão. Nada está centralizado; tudo é alcançável.
+"O objetivo não é centralizar conhecimento. É torná-lo fácil de encontrar."
 -->
 
 ---
@@ -509,7 +556,7 @@ Transição: "O que levar daqui."
 
 <!--
 Três coisas para segunda-feira:
-1. Documente: base de documentação central e descobrível, com páginas de domínio com dono, ADRs e runbooks. Um ponto de entrada; o resto o agente descobre. É o contexto do agente, e ajuda primeiro as pessoas.
+1. Documente: docs com dono, decisões registradas (ADRs), página do domínio e runbooks. É o contexto do agente, e ajuda primeiro as pessoas. É o contexto do agente, e ajuda primeiro as pessoas.
 2. Teste determinístico: testes, contratos, tipos, CI, fitness functions e guardrails são a rede de segurança.
 3. Deixe a IA propor: ela gera código, testes e hipóteses. Quem valida é o determinístico, não outra rodada de IA.
 Feedback: cada task devolve conhecimento para a doc, e a próxima começa com mais contexto.
