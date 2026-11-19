@@ -1,0 +1,10 @@
+{
+  "name": "ai-friendly-architecture-short-slides",
+  "private": true,
+  "scripts": {
+    "dev": "marp --no-stdin -s .",
+    "build": "marp --no-stdin slides.md -o dist/index.html && mkdir -p dist && cp -R assets dist/",
+    "pdf": "marp --no-stdin slides.md --pdf --allow-local-files -o dist/ai-friendly-architecture-short.pdf",
+    "pptx": "marp --no-stdin slides.md --pptx --allow-local-files -o dist/ai-friendly-architecture-short.pptx"
+  }
+}
