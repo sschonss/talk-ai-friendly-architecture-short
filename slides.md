@@ -325,7 +325,66 @@ Se ninguém atualiza a skill quando a API muda, o agente trabalha com conhecimen
 O arquivo não resolve a manutenção sozinho, mas torna a responsabilidade visível.
 Onde vive: com o código do time, num repo de plataforma ou num catálogo. Deixe claro: dono, quais agentes usam, fontes externas, versionamento, revisão e permissões.
 Observabilidade → time de plataforma, sem cópias de dados de produção. Pagamentos → time do domínio, apontando para ADRs, contratos e runbooks.
-Transição: "A skill guia. Mas guiar não é garantir."
+Transição: "A skill guia. Mas quem segue a skill é um modelo, e modelo não é previsível."
+-->
+
+---
+
+<!-- _class: statement -->
+
+> A IA é **probabilística**. O seu sistema precisa ser **determinístico**.
+
+<br>
+
+<p class="muted">Mesmo input, outputs diferentes.</p>
+
+<!--
+Uma ideia que fica mais importante a cada dia.
+- O modelo é probabilístico: mesmo prompt, mesmo contexto, e a resposta pode mudar a cada execução. Às vezes muda pouco, às vezes muda a decisão.
+- Exemplo: peça duas vezes para o agente implementar o reembolso parcial. Numa ele usa o contrato público; na outra importa uma classe interna de Orders. As duas "parecem certas".
+- Isso não é defeito a ser corrigido com um prompt melhor: é a natureza da ferramenta. Temperatura zero não resolve contexto diferente, versão nova do modelo, ferramenta que respondeu outra coisa.
+- Então a pergunta muda: não é "como faço o modelo acertar sempre?", é "o que no meu sistema verifica, do mesmo jeito todas as vezes, o que o modelo produziu?".
+Transição: "De um lado, o que varia. Do outro, o que não pode variar."
+-->
+
+---
+
+## Probabilístico × Determinístico
+
+<div class="cols">
+<div class="card warn">
+
+### Probabilístico
+- Gera
+- Sugere
+- Varia a cada execução
+
+</div>
+<div class="card good">
+
+### Determinístico
+- Testes
+- Contratos e schemas
+- Tipos e CI
+- Fitness functions
+- Guardrails e permissões
+
+</div>
+</div>
+
+<p class="muted">O modelo propõe. O determinístico <b>decide</b>.</p>
+
+<!--
+Esquerda: o modelo. Ele gera código, sugere hipóteses, escreve queries. É ótimo nisso, mas cada execução pode sair diferente.
+Direita: tudo o que dá a MESMA resposta para a MESMA entrada, sempre:
+- Testes: o critério de aceite vira código (o reembolso nunca excede o valor pago).
+- Contratos e schemas: a API de reembolso v2 e os eventos validam o formato, não a intenção.
+- Tipos e CI: o pipeline roda para todo PR, de humano ou de agente.
+- Fitness functions (ex.: deptrac): "Payments não importa internos de Orders" é uma regra em código, verificada a cada PR, mesmo meses depois.
+- Guardrails e permissões: checam ação, argumentos e ambiente ANTES de executar; o que não é permitido simplesmente não roda.
+A camada determinística transforma "parece certo" em "provado certo". Ela não confia no agente: confere o agente.
+Isso não é novidade: é engenharia que já fazíamos. A diferença é que agora ela deixou de ser boa prática e virou requisito, porque o volume de código gerado é maior e quem gera não é previsível.
+Transição: "E o lugar onde mais gente erra isso é o prompt."
 -->
 
 ---
@@ -342,6 +401,7 @@ Transição: "A skill guia. Mas guiar não é garantir."
 
 
 <!--
+Ligação com o slide anterior: o prompt é input de um sistema probabilístico; por isso ele não pode ser a barreira.
 "Use a API de produção só para leitura." "Nunca acesse endpoints de admin."
 Regras no prompt não são barreira: o agente recebe docs novas, combina fontes, lê o código; o texto pode ter instruções conflitantes.
 Checagens dentro da skill ou do MCP têm a mesma fraqueza.
