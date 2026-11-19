@@ -3,14 +3,14 @@
 **Slides online:** https://sschonss.github.io/talk-ai-friendly-architecture-short/  
 **PDF:** https://sschonss.github.io/talk-ai-friendly-architecture-short/ai-friendly-architecture-short.pdf
 
-Versão curta (~20 min, 27 slides) do deck
+Versão curta (~25 min, prática, 22 slides) do deck
 [AI-Friendly Architecture](https://sschonss.github.io/talk-ai-friendly-architecture/).
 Baseada na série
 [AI-Friendly Architecture](https://luizschons.com/series/ai-friendly-architecture/).
 
 A palestra completa está em [sschonss/talk-ai-friendly-architecture](https://github.com/sschonss/talk-ai-friendly-architecture).
 
-- `slides.md` — o deck (27 slides, em 3 atos). Cada slide tem pouco texto; o roteiro está nas **notas do apresentador** (`<!-- ... -->`).
+- `slides.md` — o deck (22 slides, em 3 atos). Cada slide tem pouco texto; o roteiro está nas **notas do apresentador** (`<!-- ... -->`).
 - `themes/aifa.css` — o mesmo tema da palestra completa.
 - `assets/` — foto e QR da série.
 

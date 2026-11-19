@@ -9,13 +9,14 @@ author: Luiz Schons
 footer: 'AI-Friendly Architecture · luizschons.com'
 
 ---
+
 <!-- _class: cover -->
 <!-- _paginate: false -->
 <!-- _footer: '' -->
 
 # AI-Friendly Architecture
 
-Preparando sistemas reais para agentes de IA
+Colocando a IA para trabalhar como dev, e mais rápido
 
 <br>
 
@@ -23,17 +24,7 @@ Preparando sistemas reais para agentes de IA
 
 <!--
 Apresentação baseada na série de 9 artigos em luizschons.com/series/ai-friendly-architecture.
-Transição: começar direto pela pergunta. A apresentação pessoal vem logo depois do gancho.
--->
-
----
-
-<!-- _class: statement -->
-
-> Seu software está pronto para ser **entendido por uma IA**?
-
-<!--
-Abrir com a pergunta. Deixar a plateia pensar alguns segundos.
+Transição: começar direto pela analogia da pessoa nova. A apresentação pessoal vem logo depois.
 -->
 
 ---
@@ -75,7 +66,7 @@ Transição: "Antes de seguir, deixa eu me apresentar."
 
 <!--
 Apresentação rápida (30 segundos): quem sou, onde trabalho, de onde venho.
-Transição: "Vou dividir a conversa em três atos." 
+Transição: "Três atos, bem práticos." 
 -->
 
 ---
@@ -83,31 +74,29 @@ Transição: "Vou dividir a conversa em três atos."
 ## O caminho
 
 <div class="cols3">
-<div class="card"><p class="muted small">Ato 1</p><h3>O problema</h3></div>
-<div class="card"><p class="muted small">Ato 2</p><h3>Conhecimento e limites</h3></div>
+<div class="card"><p class="muted small">Ato 1</p><h3>Documente</h3></div>
+<div class="card"><p class="muted small">Ato 2</p><h3>Teste determinístico</h3></div>
 <div class="card"><p class="muted small">Ato 3</p><h3>Na prática</h3></div>
 </div>
 
-
-
 <!--
-Três atos, construídos a partir da série de 9 artigos.
-- Ato 1: o problema. O contexto que o agente precisa não está no código: está em docs, decisões e observabilidade.
-- Ato 2: como organizar esse conhecimento (skills por contexto) e como colocar limites que não dependem do prompt (guardrails e fitness functions).
-- Ato 3: tudo junto, numa task real, do épico até produção.
-Um único exemplo atravessa a palestra: o domínio de pagamentos, o Payment Service e uma feature de reembolso parcial.
+Palestra curta e prática: como colocar a IA para trabalhar como um dev, e mais rápido.
+- Ato 1: documentação é o contexto do agente. Sem ela, ele adivinha.
+- Ato 2: a IA é probabilística; a rede de segurança é determinística (testes, contratos, CI, guardrails).
+- Ato 3: tudo junto numa task real, do link da task até o deploy.
+Exemplo único: domínio de pagamentos, Payment Service, reembolso parcial.
 -->
 
 ---
 
 <!-- _class: divider -->
 
-<div class="kicker">Ato 1 · O problema</div>
+<div class="kicker">Ato 1 · Documente</div>
 
-# O contexto não está no código
+# Documentação é contexto
 
 <!--
-Primeiro ato: por que agentes erram em sistemas reais, e por que o problema raramente é só o modelo.
+O agente é a pessoa nova que chega todo dia. O que ele não encontra, ele inventa. Documentação deixa de ser burocracia e vira insumo de trabalho.
 -->
 
 ---
@@ -150,36 +139,6 @@ Mas sistemas são desenhados para quem JÁ tem contexto. Um dev da casa sabe:
 - onde olhar num incidente;
 - quais métricas indicam problema real.
 O agente não sabe nada disso por padrão. Contexto espalhado, escondido ou inconsistente derruba a qualidade da resposta.
--->
-
----
-
-## O que o código mostra
-
-<div class="cols">
-<div class="card good">
-
-### Mostra
-- Implementação
-- Estrutura
-- O que existe hoje
-
-</div>
-<div class="card bad">
-
-### Não mostra
-- Por quê
-- Trade-offs
-- O que foi descartado
-- Produção
-
-</div>
-</div>
-
-<!--
-Armadilha: "a IA lê código, então entende o sistema".
-O código não mostra: por que a decisão foi tomada, qual problema de negócio resolve, quais trade-offs foram aceitos, quais partes são sensíveis, o que foi tentado e descartado, como se comporta em produção.
-Um sistema maduro vive além do repo: docs, observabilidade, incidentes, tickets, ADRs, dashboards, memória do time.
 -->
 
 ---
@@ -266,66 +225,42 @@ Para o agente é igual: se ele só olha taxa de erro, conclui "está saudável".
 
 ---
 
-<!-- _class: divider -->
+## Contexto mora no repositório
 
-<div class="kicker">Ato 2 · Conhecimento e limites</div>
-
-# Organizar o conhecimento. Definir limites.
-
-<!--
-Segundo ato: se o contexto está espalhado, como organizá-lo para o agente (skills por contexto) e como garantir limites que não dependem do prompt (guardrails e fitness functions).
--->
-
----
-
-## Uma Context Skill bem delimitada
-
-<div class="cols5">
-<div class="card big">Vocabulário</div>
-<div class="card big">Contratos</div>
-<div class="card big">Fontes</div>
-<div class="card big">Limites</div>
-<div class="card big">Ownership</div>
-</div>
-
-<br>
-
-<p class="muted">10 skills para uma pergunta simples? <b>Fronteira errada.</b></p>
-
-<!--
-O que uma Context Skill sabe, com o exemplo de pagamentos:
-1. Vocabulário: transação, autorização, captura, reembolso. Ex.: distinguir transação AUTORIZADA de CAPTURADA antes de qualquer hipótese.
-2. Contratos: APIs, eventos e schemas; o que exige versionamento.
-3. Fontes de verdade: docs, logs, métricas e traces, deploys recentes, queries read-only.
-4. Limites: read-only, sem comandos de escrita, nada sensível no output, o que precisa de aprovação, quando parar e escalar. A skill guia, mas não é a única proteção.
-5. Ownership: qual serviço faz o quê e quem é dono da skill, quem revisa quando o contexto muda (ex.: payments-team). Puxa o próximo slide.
-
-Fronteira: decompor não é criar centenas de skills minúsculas.
-Uma boa fronteira agrupa o que MUDA junto, é USADO junto e tem DONO relacionado.
-Teste: se esse contexto muda, quem precisa revisar? Se envolve times muito diferentes, a fronteira está grande demais.
-Comece grande (Observabilidade, Delivery, Dados, Pagamentos, Pedidos, Segurança) e divida só quando houver necessidade real.
--->
-
----
-
-## Se todo mundo é dono, ninguém é
-
-```yaml
-name: payments-context
-owner: payments-team
-review_frequency: quarterly
-sources:
-  - payment-service
-  - payment-documentation
-  - payment-dashboards
+```text
+AGENTS.md                  # como trabalhar aqui
+docs/payments/
+  README.md                # domínio, dono, links
+  adr/012-reembolso.md     # o porquê
+  runbooks/latencia.md     # o que fazer
+skills/payments-context/
+  SKILL.md                 # owner: payments-team
 ```
 
+<p class="muted">Se a resposta é “pergunta pro fulano”, falta <b>doc</b>.</p>
+
 <!--
-Se ninguém atualiza a skill quando a API muda, o agente trabalha com conhecimento velho.
-O arquivo não resolve a manutenção sozinho, mas torna a responsabilidade visível.
-Onde vive: com o código do time, num repo de plataforma ou num catálogo. Deixe claro: dono, quais agentes usam, fontes externas, versionamento, revisão e permissões.
-Observabilidade → time de plataforma, sem cópias de dados de produção. Pagamentos → time do domínio, apontando para ADRs, contratos e runbooks.
-Transição: "A skill guia. Mas quem segue a skill é um modelo, e modelo não é previsível."
+Prático: onde o agente encontra contexto.
+- AGENTS.md: o ponto de entrada do repositório. Como rodar, como testar, convenções, o que não fazer.
+- docs/ por domínio: página do domínio com dono e links (código, ADRs, contratos, runbooks, dashboards, incidentes). A página aponta, não copia.
+- ADRs: guardam o PORQUÊ, que o código não mostra.
+- Runbooks: o passo a passo de incidentes, com queries prontas (foi o que levou à hipótese focada no slide anterior).
+- Context Skills: conhecimento e workflow de um contexto (vocabulário, contratos, fontes, limites). Fronteira: o que muda junto e tem dono relacionado.
+- Ownership: toda skill e toda doc têm dono e revisão. Se todo mundo é dono, ninguém é, e o agente trabalha com conhecimento velho.
+Comece pequeno: um fluxo crítico (checkout), um runbook, um AGENTS.md.
+Transição: "Documentação dá contexto. Mas contexto não é garantia."
+-->
+
+---
+
+<!-- _class: divider -->
+
+<div class="kicker">Ato 2 · Teste determinístico</div>
+
+# A IA propõe. O teste decide.
+
+<!--
+Contexto melhora a chance de acerto, mas não garante. Quem garante é o que dá a mesma resposta todas as vezes.
 -->
 
 ---
@@ -384,7 +319,8 @@ Direita: tudo o que dá a MESMA resposta para a MESMA entrada, sempre:
 - Guardrails e permissões: checam ação, argumentos e ambiente ANTES de executar; o que não é permitido simplesmente não roda.
 A camada determinística transforma "parece certo" em "provado certo". Ela não confia no agente: confere o agente.
 Isso não é novidade: é engenharia que já fazíamos. A diferença é que agora ela deixou de ser boa prática e virou requisito, porque o volume de código gerado é maior e quem gera não é previsível.
-Transição: "E o lugar onde mais gente erra isso é o prompt."
+Prompt orienta, não protege: regra só no prompt não é barreira. A skill guia; o guardrail garante.
+Transição: "E o prompt? Não é barreira."
 -->
 
 ---
@@ -401,7 +337,6 @@ Transição: "E o lugar onde mais gente erra isso é o prompt."
 
 
 <!--
-Ligação com o slide anterior: o prompt é input de um sistema probabilístico; por isso ele não pode ser a barreira.
 "Use a API de produção só para leitura." "Nunca acesse endpoints de admin."
 Regras no prompt não são barreira: o agente recebe docs novas, combina fontes, lê o código; o texto pode ter instruções conflitantes.
 Checagens dentro da skill ou do MCP têm a mesma fraqueza.
@@ -411,7 +346,43 @@ A skill deve dizer: o que é read-only, o que precisa de aprovação, quais dado
 MAS limites não podem existir só como instrução. Guardrails fixos checam permissões, argumentos, ambiente e impacto ANTES da ação.
 Nunca assuma que o agente vai seguir uma regra de segurança sozinho.
 Como começar: pegue um problema recorrente e observe o expert. Quais perguntas vêm primeiro? Quais fontes? Como interpreta? Que hipóteses descarta? Quando escala? Que output é útil?
-Transição para o Ato 3: contexto organizado, limites fora do prompt. Agora vamos ver tudo isso numa task real.
+Transição: "E aí vem a tentação: usar a própria IA para validar. Não é o melhor caminho."
+-->
+
+---
+
+## Não use a IA como teste
+
+<div class="cols">
+<div class="card bad">
+
+### IA reproduz o cenário
+- Paga tokens toda vez
+- Lento
+- Resultado varia
+
+</div>
+<div class="card good">
+
+### IA escreve o teste, CI roda
+- Custo quase zero
+- Rápido
+- Sempre igual
+
+</div>
+</div>
+
+<p class="muted">A IA escreve o teste. Não <b>é</b> o teste.</p>
+
+<!--
+Erro comum: pedir para o agente "testar" abrindo o sistema, simulando o fluxo, lendo logs e dizendo se funcionou. Toda vez.
+Problemas:
+- Custa: cada validação consome tokens de novo.
+- É lento: o agente raciocina, chama ferramentas, espera.
+- Varia: o mesmo pedido pode dar "passou" hoje e "falhou" amanhã. Um validador probabilístico não é prova.
+Melhor: use a IA UMA vez para escrever o teste ou o script (concorrência, idempotência, reembolso nunca maior que o pago). Depois ele roda no CI em todo PR, de graça, rápido e sempre igual.
+O agente continua útil: escreve o teste, interpreta a falha, propõe a correção. Quem dá o veredito é o teste.
+Transição para o Ato 3: "Vamos ver tudo isso numa task real."
 -->
 
 ---
@@ -420,62 +391,10 @@ Transição para o Ato 3: contexto organizado, limites fora do prompt. Agora vam
 
 <div class="kicker">Ato 3 · Na prática</div>
 
-# Do épico à produção
+# Do link da task ao deploy
 
 <!--
-Terceiro ato: juntar tudo numa task real do domínio de pagamentos, o reembolso parcial, do épico até produção.
--->
-
----
-
-<!-- _class: statement -->
-
-> “Quero devolver **só alguns itens** do pedido.”
-
-<!--
-Épico de exemplo: reembolso parcial.
-Parece pequeno, mas toca: criação de pedido, cálculo de total, dono do pagamento, ligação item ↔ transação, regras de cancelamento, estoque, notificações, dados do provedor.
-Um agente trabalhando só a partir do épico produz uma solução plausível, mas errada.
--->
-
----
-
-## A entrega inteira
-
-<div class="phases">
-<div class="phase">
-<div class="phase-title">Entender</div>
-<div class="phase-step">Questionar</div>
-<div class="phase-step">Spike</div>
-<div class="phase-step">Decisão</div>
-</div>
-<div class="phase">
-<div class="phase-title">Planejar</div>
-<div class="phase-step">Sucesso</div>
-<div class="phase-step">Tarefas e testes</div>
-<div class="phase-step">Sinais</div>
-</div>
-<div class="phase hl">
-<div class="phase-title">Construir</div>
-<div class="phase-step">Código</div>
-</div>
-<div class="phase">
-<div class="phase-title">Operar</div>
-<div class="phase-step">Deploy</div>
-<div class="phase-step">Monitorar</div>
-<div class="phase-step">Docs</div>
-</div>
-</div>
-
-<p class="muted">O código é uma etapa, não a entrega.</p>
-
-<!--
-O agente participa do ciclo inteiro, não só de escrever código.
-- Entender: questionar o épico, fazer o spike, registrar a decisão.
-- Planejar: definir sucesso, quebrar em tarefas, definir testes, decidir sinais e alertas ANTES do código.
-- Construir: o código. Repare: é uma coluna de quatro, e a menor.
-- Operar: deploy com aprovação humana, monitorar contra o baseline, atualizar a documentação com o que foi aprendido.
-Entender o problema, decisões, critérios de sucesso, ambientes e sinais podem exigir mais raciocínio do que codar.
+Juntar tudo numa task real: reembolso parcial no Payment Service.
 -->
 
 ---
@@ -559,21 +478,12 @@ Transição: "O que levar daqui."
 
 ---
 
-<!-- _class: divider -->
+## O que levar daqui
 
-<div class="kicker">Fechamento</div>
-
-# O que levar daqui
-
----
-
-## Agentes melhores precisam de
-
-<div class="cols4">
-<div class="card big">Contexto<div class="small muted">docs e ADRs</div></div>
-<div class="card big">Limites<div class="small muted">guardrails</div></div>
-<div class="card big">Evidências<div class="small muted">sinais reais</div></div>
-<div class="card big accent">Feedback<div class="small muted">doc que evolui</div></div>
+<div class="cols3">
+<div class="card big">Documente<div class="small muted">docs e ADRs</div></div>
+<div class="card big">Teste determinístico<div class="small muted">CI decide</div></div>
+<div class="card big accent">Deixe a IA propor<div class="small muted">e escrever testes</div></div>
 </div>
 
 <br>
@@ -581,12 +491,11 @@ Transição: "O que levar daqui."
 <p class="muted">Menos adivinhação. Mais <b>arquitetura</b>.</p>
 
 <!--
-Fechamento em uma frase: agentes melhores dependem menos de adivinhar e mais de contexto, limites, evidências e feedback.
-- Contexto: docs com dono, decisões registradas (ADRs), página do domínio.
-- Limites: guardrails e fitness functions, fora do prompt.
-- Evidências: observabilidade que conta a história (200 OK não basta).
-- Feedback: cada task devolve conhecimento para a doc, e a próxima começa com mais contexto.
-Tudo isso ajuda primeiro as pessoas. O agente é só a pessoa nova que chega todo dia.
+Três coisas para segunda-feira:
+1. Documente: AGENTS.md, docs por domínio com dono, ADRs e runbooks. É o contexto do agente, e ajuda primeiro as pessoas.
+2. Teste determinístico: testes, contratos, tipos, CI, fitness functions e guardrails são a rede de segurança.
+3. Deixe a IA propor: ela gera código, testes e hipóteses. Quem valida é o determinístico, não outra rodada de IA.
+Feedback: cada task devolve conhecimento para a doc, e a próxima começa com mais contexto.
 Transição: série de artigos e perguntas.
 -->
 
