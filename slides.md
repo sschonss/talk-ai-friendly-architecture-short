@@ -156,7 +156,7 @@ O agente não sabe nada disso por padrão. Contexto espalhado, escondido ou inco
 
 <p class="muted small">Com contexto</p>
 <div class="flow">
-<div><code>docs/payments</code></div><span>→</span>
+<div>Doc de Payments</div><span>→</span>
 <div>Runbook</div><span>→</span>
 <div>Queries</div><span>→</span>
 <div class="ok">Hipótese focada</div>
@@ -165,7 +165,7 @@ O agente não sabe nada disso por padrão. Contexto espalhado, escondido ou inco
 <!--
 Apresentar o domínio que vai nos acompanhar até o fim: pagamentos. Cenário: a latência do checkout começa a subir (vamos chamar de INC-2291).
 SEM arquitetura AI-friendly, o agente depende de sorte: procura logs no serviço errado, lê dashboards sem saber quais métricas importam, perde tempo e sugere hipóteses genéricas ("aumente os recursos").
-COM contexto organizado o caminho é direto: entra na pasta de docs do domínio, acha o runbook de latência, usa as queries prontas e chega numa hipótese focada.
+COM contexto organizado o caminho é direto: entra pela página do domínio na base de documentação, acha o runbook de latência, usa as queries prontas e chega numa hipótese focada.
 Em detalhe:
 1. Identifica o serviço afetado (Payment Service)
 2. Consulta a doc do domínio de pagamentos
@@ -225,29 +225,46 @@ Para o agente é igual: se ele só olha taxa de erro, conclui "está saudável".
 
 ---
 
-## Contexto mora no repositório
+## Um ponto de entrada, o resto se descobre
 
-```text
-AGENTS.md                  # como trabalhar aqui
-docs/payments/
-  README.md                # domínio, dono, links
-  adr/012-reembolso.md     # o porquê
-  runbooks/latencia.md     # o que fazer
-skills/payments-context/
-  SKILL.md                 # owner: payments-team
-```
+<svg class="network" viewBox="0 0 1640 560" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Um ponto de entrada leva ao domínio e dele às fontes de contexto; o repositório guarda só código">
+<defs><marker id="arrd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3b5bdb"/></marker></defs>
+<line x1="323" y1="225" x2="525" y2="225" stroke="#3b5bdb" stroke-width="3" marker-end="url(#arrd)"/>
+<line x1="868" y1="225" x2="1215" y2="55" stroke="#3b5bdb" stroke-width="3" marker-end="url(#arrd)"/>
+<line x1="868" y1="225" x2="1215" y2="165" stroke="#3b5bdb" stroke-width="3" marker-end="url(#arrd)"/>
+<line x1="868" y1="225" x2="1215" y2="275" stroke="#3b5bdb" stroke-width="3" marker-end="url(#arrd)"/>
+<line x1="868" y1="225" x2="1215" y2="385" stroke="#3b5bdb" stroke-width="3" marker-end="url(#arrd)"/>
+<rect x="60" y="185" width="260" height="80" rx="16" fill="#ffffff" stroke="#e4e1da" stroke-width="2"/>
+<text x="190.0" y="235.0" text-anchor="middle" font-family="Inter, sans-serif" font-size="30" font-weight="600" fill="#1d1f24">Índice</text>
+<rect x="535" y="185" width="330" height="80" rx="16" fill="#3b5bdb" stroke="#3b5bdb" stroke-width="2"/>
+<text x="700.0" y="235.0" text-anchor="middle" font-family="Inter, sans-serif" font-size="30" font-weight="700" fill="#ffffff">Domínio Payments</text>
+<rect x="1225" y="20" width="330" height="70" rx="16" fill="#ffffff" stroke="#e4e1da" stroke-width="2"/>
+<text x="1390.0" y="65.0" text-anchor="middle" font-family="Inter, sans-serif" font-size="30" font-weight="600" fill="#1d1f24">ADRs</text>
+<rect x="1225" y="130" width="330" height="70" rx="16" fill="#ffffff" stroke="#e4e1da" stroke-width="2"/>
+<text x="1390.0" y="175.0" text-anchor="middle" font-family="Inter, sans-serif" font-size="30" font-weight="600" fill="#1d1f24">Runbooks</text>
+<rect x="1225" y="240" width="330" height="70" rx="16" fill="#ffffff" stroke="#e4e1da" stroke-width="2"/>
+<text x="1390.0" y="285.0" text-anchor="middle" font-family="Inter, sans-serif" font-size="30" font-weight="600" fill="#1d1f24">Queries</text>
+<rect x="1225" y="350" width="330" height="70" rx="16" fill="#eef1fd" stroke="#3b5bdb" stroke-width="2"/>
+<text x="1390.0" y="395.0" text-anchor="middle" font-family="Inter, sans-serif" font-size="30" font-weight="600" fill="#1d1f24">Context Skill</text>
+<text x="1390" y="445" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" fill="#7a7d86">owner: payments-team</text>
+<text x="190" y="308" text-anchor="middle" font-family="Inter, sans-serif" font-size="24" font-weight="700" letter-spacing="2" fill="#7a7d86">PONTO DE ENTRADA</text>
+<text x="700" y="308" text-anchor="middle" font-family="Inter, sans-serif" font-size="24" font-weight="700" letter-spacing="2" fill="#7a7d86">BASE DE DOCS</text>
+<rect x="60" y="440" width="420" height="80" rx="16" fill="#f4f2ee" stroke="#c9c5bc" stroke-width="2" stroke-dasharray="8 6"/>
+<text x="270.0" y="490.0" text-anchor="middle" font-family="Inter, sans-serif" font-size="28" font-weight="600" fill="#7a7d86">Repositório · só código</text>
+</svg>
 
-<p class="muted">Se a resposta é “pergunta pro fulano”, falta <b>doc</b>.</p>
+<p class="muted">O repositório guarda código. O contexto mora na <b>documentação</b>.</p>
 
 <!--
-Prático: onde o agente encontra contexto.
-- AGENTS.md: o ponto de entrada do repositório. Como rodar, como testar, convenções, o que não fazer.
-- docs/ por domínio: página do domínio com dono e links (código, ADRs, contratos, runbooks, dashboards, incidentes). A página aponta, não copia.
-- ADRs: guardam o PORQUÊ, que o código não mostra.
-- Runbooks: o passo a passo de incidentes, com queries prontas (foi o que levou à hipótese focada no slide anterior).
-- Context Skills: conhecimento e workflow de um contexto (vocabulário, contratos, fontes, limites). Fronteira: o que muda junto e tem dono relacionado.
-- Ownership: toda skill e toda doc têm dono e revisão. Se todo mundo é dono, ninguém é, e o agente trabalha com conhecimento velho.
-Comece pequeno: um fluxo crítico (checkout), um runbook, um AGENTS.md.
+Onde o contexto deve morar: não no repositório. O repositório é para código.
+O contexto fica numa base de documentação CENTRALIZADA e DESCOBRÍVEL, separada dos repos de código.
+- Você não cola documentação no prompt: entrega ao agente um ponto de entrada (um índice).
+- Do índice ele navega até a página do domínio (Payments), que tem dono e data de atualização, e dela até o que precisa: ADRs (o porquê), runbooks (o que fazer), queries prontas e a Context Skill do domínio.
+- A página aponta, não copia: cada coisa vive no sistema onde vive. O código é só mais um link.
+- Context Skill com dono (payments-team) e revisão: se todo mundo é dono, ninguém é, e o agente trabalha com conhecimento velho.
+- Ele não lê tudo: segue só os links relevantes para a tarefa.
+Se a resposta é "pergunta pro fulano", falta documentação.
+Comece pequeno: um fluxo crítico (checkout), uma página de domínio, um runbook.
 Transição: "Documentação dá contexto. Mas contexto não é garantia."
 -->
 
@@ -492,7 +509,7 @@ Transição: "O que levar daqui."
 
 <!--
 Três coisas para segunda-feira:
-1. Documente: AGENTS.md, docs por domínio com dono, ADRs e runbooks. É o contexto do agente, e ajuda primeiro as pessoas.
+1. Documente: base de documentação central e descobrível, com páginas de domínio com dono, ADRs e runbooks. Um ponto de entrada; o resto o agente descobre. É o contexto do agente, e ajuda primeiro as pessoas.
 2. Teste determinístico: testes, contratos, tipos, CI, fitness functions e guardrails são a rede de segurança.
 3. Deixe a IA propor: ela gera código, testes e hipóteses. Quem valida é o determinístico, não outra rodada de IA.
 Feedback: cada task devolve conhecimento para a doc, e a próxima começa com mais contexto.
